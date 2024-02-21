@@ -157,6 +157,10 @@ h3 {
     :root {
         --black--: #222;
     }
+    body{
+        padding: auto;
+        padding-top: 50px;
+    }
     h1 {
         font-size: 22px;
     }
