@@ -9,6 +9,8 @@ let currencyH1 = document.getElementById("currencyH1");
 let currencyH2 = document.getElementById("currencyH2");
 let resultHeading = document.getElementById("resultHeading");
 let resultText = document.getElementById("resultText");
+let errorMessage = document.getElementById("errorMessage");
+
 let mainFunction = function () {
     currency1 = document.getElementById("currencyBefore").value; //Currency Text 1
     currency2 = document.getElementById("currencyAfter").value; //Currency Text 2
