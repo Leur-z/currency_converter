@@ -1,7 +1,8 @@
-let currency1,
-    currency2,
-    amountBefore,
-    amountAfter = "";
+let currency1;
+let currency2;
+let amountBefore;
+let amountAfter;
+let errorStatus = true;
 let input1 = document.getElementById("valueBefore"); // input element
 let input2 = document.getElementById("valueAfter"); //input element
 let currencyH1 = document.getElementById("currencyH1");
@@ -16,10 +17,23 @@ let mainFunction = function () {
     amountAfter = Number(document.getElementById("valueAfter").value); //input element
 
     ER = Number(document.getElementById("exchangeRate").value);
-    calculation();
-    input2.value = amountAfter;
-    resultHeading.innerText = `Convert From ${currency1} To ${currency2}`;
-    resultText.innerText = `${amountBefore} ${currency1} : ${amountAfter} ${currency2}`;
+    if (amountBefore === 0) {
+        errorStatus = false;
+        errorMessage.innerHTML = "Please type in amount to convert.";
+    } else if (ER === 0) {
+        errorStatus = false;
+        errorMessage.innerHTML = "Please type in exchange rate.";
+    } else if (ER !== 0 && amountBefore !== 0) {
+        errorStatus = true;
+        errorMessage.innerHTML = "";
+    }
+
+    if (errorStatus) {
+        calculation();
+        input2.value = amountAfter;
+        resultHeading.innerText = `Convert From ${currency1} To ${currency2}`;
+        resultText.innerText = `${amountBefore} ${currency1} : ${amountAfter} ${currency2}`;
+    }
 };
 
 let calculation = function () {
@@ -54,8 +68,4 @@ let calculation = function () {
     }
 
     amountAfter = Number(amountAfter).toFixed(2);
-    amountAfter =
-        amountAfter[amountAfter.length - 1] == "0"
-            ? (amountAfter = parseFloat(Number(amountAfter)))
-            : amountAfter;
 };
