@@ -1,73 +1,129 @@
-let currency1;
-let currency2;
-let amountBefore;
-let amountAfter;
-let errorStatus = true;
-let input1 = document.getElementById("valueBefore"); // input element
-let input2 = document.getElementById("valueAfter"); //input element
-let currencyH1 = document.getElementById("currencyH1");
-let currencyH2 = document.getElementById("currencyH2");
+let currencyFrom;
+let currencyTo;
+let amountFrom;
+let amountTo;
+let exchangeRate;
+let errorStatus = false;
+let currencyTypeFrom;
+let currencyTypeTo;
+let inputFrom = document.getElementById("valueBefore");
+let inputTo = document.getElementById("valueAfter");
 let resultHeading = document.getElementById("resultHeading");
 let resultText = document.getElementById("resultText");
 let errorMessage = document.getElementById("errorMessage");
+let button = document.getElementById("button");
+button.addEventListener("click", mainFunction);
 
-let mainFunction = function () {
-    currency1 = document.getElementById("currencyBefore").value; //Currency Text 1
-    currency2 = document.getElementById("currencyAfter").value; //Currency Text 2
+function mainFunction() {
+    amountFrom = Number(inputFrom.value);
+    amountTo = inputTo.value;
+    exchangeRate = document.getElementById("exchangeRate").value;
+    currencyTypeFrom = document.getElementById("currencyBefore").value;
+    currencyTypeTo = document.getElementById("currencyAfter").value;
 
-    amountBefore = Number(document.getElementById("valueBefore").value); // input element
-    amountAfter = Number(document.getElementById("valueAfter").value); //input element
-
-    ER = Number(document.getElementById("exchangeRate").value);
-    if (amountBefore === 0) {
-        errorStatus = false;
-        errorMessage.innerHTML = "Please type in amount to convert.";
-    } else if (ER === 0) {
-        errorStatus = false;
-        errorMessage.innerHTML = "Please type in exchange rate.";
-    } else if (ER !== 0 && amountBefore !== 0) {
+    errorChecking();
+    if (!errorStatus) {
+        calculation();
+        console.log(amountTo);
+        resultHeading.innerText = `Convert From ${currencyTypeFrom} To ${currencyTypeTo}`;
+        resultText.innerText = `${amountFrom} ${currencyTypeFrom} : ${Number(
+            amountTo
+        ).toFixed(2)} ${currencyTypeTo}`;
+    }
+}
+function errorChecking() {
+    if (amountFrom === 0) {
         errorStatus = true;
+        errorMessage.innerHTML = "Please type in amount to convert.";
+    } else if (Number(exchangeRate.value) === 0) {
+        errorStatus = true;
+        errorMessage.innerHTML = "Please type in exchange rate.";
+    } else {
+        errorStatus = false;
         errorMessage.innerHTML = "";
     }
+}
+function calculation() {
+    switch (currencyTypeFrom) {
+        case "THB":
+            switch (currencyTypeTo) {
+                // THB => MMK
+                case "MMK":
+                    // 1000 Bhat = ... Kyats Exchange Rate
+                    if (exchangeRate > 90000) {
+                        amountTo = multiplication(
+                            amountFrom / 1000,
+                            exchangeRate
+                        );
+                        console.log(amountTo);
+                        return amountTo;
+                    }
+                    // 1 Bhat = ...Kyats Exchange Rate
+                    else if (exchangeRate > 10 && exchangeRate < 900) {
+                        amountTo = multiplication(amountFrom, exchangeRate);
+                        console.log(amountTo);
+                        return amountTo;
+                    }
+                    break;
 
-    if (errorStatus) {
-        calculation();
-        input2.value = amountAfter;
-        resultHeading.innerText = `Convert From ${currency1} To ${currency2}`;
-        resultText.innerText = `${amountBefore} ${currency1} : ${amountAfter} ${currency2}`;
-    }
-};
-
-let calculation = function () {
-    if (currency1 == "THB") {
-        if (currency2 == "MMK") {
-            amountAfter = ER * amountBefore;
-        } else if (currency2 == "CNY") {
-            amountAfter = amountBefore / ER;
-        }
-    } else if (currency1 == "CNY") {
-        if (currency2 == "MMK") {
-            amountAfter = ER * amountBefore;
-        } else if (currency2 == "THB") {
-            amountAfter = Math.round(amountBefore * ER);
-        }
-    } else if (currency1 == "MMK") {
-        if (currency2 == "THB") {
-            if (ER > 0 && ER < 1) {
-                amountAfter = ER * amountBefore;
-            } else if (ER > 1 && ER < 200) {
-                amountAfter = (1 / ER) * amountBefore;
-            } else {
-                amountAfter = (1000 / ER) * amountBefore;
+                // THB => CNY
+                case "CNY":
+                    if (exchangeRate > 400) {
+                        amountTo = division(amountFrom, exchangeRate / 100);
+                        return amountTo;
+                    } else if (exchangeRate > 5 && exchangeRate < 100) {
+                        amountTo = division(amountFrom, exchangeRate);
+                        return amountTo;
+                    }
+                    break;
             }
-        } else if (currency2 == "CNY") {
-            if (ER > 0 && ER < 100) {
-                amountAfter = amountBefore / ER;
-            } else if (ER > 100 && ER < 1000) {
-                amountAfter = (ER / 100) * amountBefore;
+            break;
+        case "MMK":
+            switch (currencyTypeFrom) {
+                case "THB":
+                    if (exchangeRate > 90000) {
+                        amountTo = multiplication(
+                            1000 / exchangeRate,
+                            amountFrom
+                        );
+                    } else if (exchangeRate > 0 && exchangeRate < 1) {
+                        amountTo = multiplication(amountFrom, exchangeRate);
+                    } else {
+                        amountTo = multiplication(amountFrom, 1 / exchangeRate);
+                    }
+                    break;
+                case "CNY":
+                    if (exchangeRate > 0 && exchangeRate < 200) {
+                        amountTo = multiplication(amountFrom, exchangeRate);
+                        return amountTo;
+                    } else if (exchangeRate > 400) {
+                        amountTo = multiplication(amountBefore, ER / 100);
+                        return amountTo;
+                    }
+                    break;
             }
-        }
+            break;
+        case "CNY":
+            switch (currencyTypeFrom) {
+                case "MMK":
+                    amountTo = multiplication(amountFrom, exchangeRate);
+                    break;
+                case "THB":
+                    if (exchangeRate > 400) {
+                        amountTo = multiplication(amountFrom, 1 / exchangeRate);
+                        return amountTo;
+                    } else if (exchangeRate > 0 && exchangeRate < 1) {
+                        amountTo = multiplication(amountFrom, exchangeRate);
+                        return amountTo;
+                    }
+                    break;
+            }
+            break;
     }
-
-    amountAfter = Number(amountAfter).toFixed(2);
-};
+}
+function multiplication(num, ER) {
+    return num * ER;
+}
+function division(num, ER) {
+    return num / ER;
+}
