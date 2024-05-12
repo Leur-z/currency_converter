@@ -24,7 +24,7 @@ function mainFunction() {
     errorChecking();
     if (!errorStatus) {
         calculation();
-        console.log(amountTo);
+        inputTo.value = amountTo;
         resultHeading.innerText = `Convert From ${currencyTypeFrom} To ${currencyTypeTo}`;
         resultText.innerText = `${amountFrom} ${currencyTypeFrom} : ${Number(
             amountTo
@@ -104,15 +104,21 @@ function calculation() {
             }
             break;
         case "CNY":
-            switch (currencyTypeFrom) {
+            switch (currencyTypeTo) {
                 case "MMK":
-                    amountTo = multiplication(amountFrom, exchangeRate);
+                    if (exchangeRate > 400) {
+                        amountTo = multiplication(amountFrom, exchangeRate);
+                        return amountTo;
+                    }
                     break;
                 case "THB":
                     if (exchangeRate > 400) {
-                        amountTo = multiplication(amountFrom, 1 / exchangeRate);
+                        amountTo = multiplication(
+                            amountFrom,
+                            exchangeRate / 100
+                        );
                         return amountTo;
-                    } else if (exchangeRate > 0 && exchangeRate < 1) {
+                    } else if (exchangeRate > 1 && exchangeRate < 100) {
                         amountTo = multiplication(amountFrom, exchangeRate);
                         return amountTo;
                     }
